@@ -2,20 +2,13 @@ import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
 const PHONE = "+7 (902) 813-34-45";
-
-
-
-const promotions = [
-  { emoji: "🛍️", title: "3 кг яблок = 4-й в подарок", desc: "При покупке от 3 кг яблок — 1 кг бесплатно!", color: "from-orange-400 to-orange-600" },
-  { emoji: "🚚", title: "Бесплатная доставка", desc: "При заказе от 1500 ₽ доставка бесплатно", color: "from-green-400 to-green-600" },
-  { emoji: "🎁", title: "Скидка 15% новым клиентам", desc: "Первый заказ — скидка 15% на всё!", color: "from-yellow-400 to-orange-500" },
-];
+const ADMIN_PASSWORD = "Amonpro2009";
 
 const sections = ["Главная", "Каталог", "Доставка", "О нас", "Акции", "Контакты"];
-
 const BADGES = ["", "Хит", "Акция", "Новинка"];
 
 type Fruit = { emoji: string; name: string; desc: string; price: string; badge: string };
+type Promo = { emoji: string; title: string; desc: string; color: string };
 
 const defaultFruits: Fruit[] = [
   { emoji: "🍎", name: "Яблоки", desc: "Свежие, сочные, хрустящие", price: "от 89 ₽/кг", badge: "Хит" },
@@ -28,22 +21,67 @@ const defaultFruits: Fruit[] = [
   { emoji: "🍋", name: "Лимоны", desc: "Свежие, без воска", price: "от 99 ₽/кг", badge: "" },
 ];
 
+const defaultPromos: Promo[] = [
+  { emoji: "🛍️", title: "3 кг яблок = 4-й в подарок", desc: "При покупке от 3 кг яблок — 1 кг бесплатно!", color: "from-orange-400 to-orange-600" },
+  { emoji: "🚚", title: "Бесплатная доставка", desc: "При заказе от 1500 ₽ доставка бесплатно", color: "from-green-400 to-green-600" },
+  { emoji: "🎁", title: "Скидка 15% новым клиентам", desc: "Первый заказ — скидка 15% на всё!", color: "from-yellow-400 to-orange-500" },
+];
+
 export default function Index() {
   const [activeSection, setActiveSection] = useState("Главная");
   const [menuOpen, setMenuOpen] = useState(false);
   const [fruitList, setFruitList] = useState<Fruit[]>(defaultFruits);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [form, setForm] = useState<Fruit>({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
+  const [promoList, setPromoList] = useState<Promo[]>(defaultPromos);
+
+  // Admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [adminTab, setAdminTab] = useState<"fruits" | "promos" | "info">("fruits");
+
+  // Fruit form
+  const [fruitForm, setFruitForm] = useState<Fruit>({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
+
+  // Promo form
+  const [promoForm, setPromoForm] = useState<Promo>({ emoji: "🎉", title: "", desc: "", color: "from-orange-400 to-orange-600" });
+
+  // Editable site info
+  const [siteName, setSiteName] = useState("ФруктоМаркет");
+  const [siteOwner, setSiteOwner] = useState("Махсуджонов Амон Абдусамиевич");
+  const [workHours, setWorkHours] = useState("8:00 до 22:00");
+  const [deliveryZone, setDeliveryZone] = useState("Заводоуковск — Упорово");
+  const [deliveryPrice, setDeliveryPrice] = useState("от 200 ₽");
+  const [freeDelivery, setFreeDelivery] = useState("от 1500 ₽");
+
+  const login = () => {
+    if (passwordInput === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      setShowLogin(false);
+      setPasswordInput("");
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
+
+  const logout = () => { setIsAdmin(false); };
 
   const addFruit = () => {
-    if (!form.name.trim() || !form.price.trim()) return;
-    setFruitList((prev) => [...prev, form]);
-    setForm({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
+    if (!fruitForm.name.trim() || !fruitForm.price.trim()) return;
+    setFruitList((prev) => [...prev, fruitForm]);
+    setFruitForm({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
   };
 
-  const deleteFruit = (idx: number) => {
-    setFruitList((prev) => prev.filter((_, i) => i !== idx));
+  const deleteFruit = (idx: number) => setFruitList((prev) => prev.filter((_, i) => i !== idx));
+
+  const addPromo = () => {
+    if (!promoForm.title.trim() || !promoForm.desc.trim()) return;
+    setPromoList((prev) => [...prev, promoForm]);
+    setPromoForm({ emoji: "🎉", title: "", desc: "", color: "from-orange-400 to-orange-600" });
   };
+
+  const deletePromo = (idx: number) => setPromoList((prev) => prev.filter((_, i) => i !== idx));
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -54,43 +92,167 @@ export default function Index() {
 
   return (
     <div className="min-h-screen font-golos" style={{ background: "var(--fruit-bg)" }}>
+
       {/* TOP BAR */}
-      <div className="fixed top-0 left-0 right-0 z-50 text-center py-1.5 text-xs font-semibold text-white" style={{ background: "var(--fruit-green)" }}>
-        Махсуджонов Амон Абдусамиевич
+      <div className="fixed top-0 left-0 right-0 z-50 text-center py-1.5 text-xs font-semibold text-white flex items-center justify-center gap-4" style={{ background: "var(--fruit-green)" }}>
+        <span>{siteOwner}</span>
+        {isAdmin ? (
+          <button onClick={logout} className="flex items-center gap-1 bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded-full text-xs transition-all">
+            <Icon name="LogOut" size={11} /> Выйти
+          </button>
+        ) : (
+          <button onClick={() => setShowLogin(true)} className="flex items-center gap-1 bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded-full text-xs transition-all">
+            <Icon name="Lock" size={11} /> Владелец
+          </button>
+        )}
       </div>
 
+      {/* LOGIN MODAL */}
+      {showLogin && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowLogin(false)}>
+          <div className="bg-white rounded-3xl p-8 w-full max-w-sm mx-4 shadow-2xl animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-3">🔐</div>
+              <h2 className="text-2xl font-black text-gray-800">Панель владельца</h2>
+              <p className="text-gray-400 text-sm mt-1">Введите пароль для входа</p>
+            </div>
+            <input
+              type="password"
+              className={`w-full border-2 rounded-xl px-4 py-3 text-sm outline-none mb-3 ${passwordError ? "border-red-400" : "border-gray-200 focus:border-orange-400"}`}
+              placeholder="Пароль"
+              value={passwordInput}
+              onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
+              onKeyDown={(e) => e.key === "Enter" && login()}
+              autoFocus
+            />
+            {passwordError && <p className="text-red-500 text-xs mb-3 text-center">Неверный пароль</p>}
+            <button
+              onClick={login}
+              className="w-full py-3 rounded-xl text-white font-bold transition-transform hover:scale-105"
+              style={{ background: "var(--fruit-orange)" }}
+            >
+              Войти
+            </button>
+            <button onClick={() => setShowLogin(false)} className="w-full mt-2 py-2 text-gray-400 text-sm hover:text-gray-600">Отмена</button>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN PANEL */}
+      {isAdmin && (
+        <div className="fixed top-0 left-0 right-0 z-40 shadow-2xl animate-fade-in" style={{ paddingTop: "28px" }}>
+          <div style={{ background: "#1A1A1A" }}>
+            <div className="max-w-6xl mx-auto px-4">
+              <div className="flex items-center gap-2 py-3 border-b border-white/10">
+                <span className="text-orange-400 font-black text-sm mr-2">⚙️ ПАНЕЛЬ ВЛАДЕЛЬЦА</span>
+                {(["fruits", "promos", "info"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setAdminTab(tab)}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${adminTab === tab ? "text-white" : "text-gray-400 hover:text-white"}`}
+                    style={adminTab === tab ? { background: "var(--fruit-orange)" } : {}}
+                  >
+                    {tab === "fruits" ? "🍎 Каталог" : tab === "promos" ? "🔥 Акции" : "ℹ️ Информация"}
+                  </button>
+                ))}
+              </div>
+
+              {/* TAB: FRUITS */}
+              {adminTab === "fruits" && (
+                <div className="py-4">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Эмодзи 🍑" value={fruitForm.emoji} onChange={(e) => setFruitForm({ ...fruitForm, emoji: e.target.value })} />
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Название *" value={fruitForm.name} onChange={(e) => setFruitForm({ ...fruitForm, name: e.target.value })} />
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Описание" value={fruitForm.desc} onChange={(e) => setFruitForm({ ...fruitForm, desc: e.target.value })} />
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Цена * (от 99 ₽/кг)" value={fruitForm.price} onChange={(e) => setFruitForm({ ...fruitForm, price: e.target.value })} />
+                    <select className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" value={fruitForm.badge} onChange={(e) => setFruitForm({ ...fruitForm, badge: e.target.value })}>
+                      {BADGES.map((b) => <option key={b} value={b} className="text-black">{b || "Без метки"}</option>)}
+                    </select>
+                  </div>
+                  <button onClick={addFruit} disabled={!fruitForm.name.trim() || !fruitForm.price.trim()} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white font-bold text-sm transition-all disabled:opacity-40" style={{ background: "var(--fruit-green)" }}>
+                    <Icon name="Plus" size={14} /> Добавить фрукт
+                  </button>
+                </div>
+              )}
+
+              {/* TAB: PROMOS */}
+              {adminTab === "promos" && (
+                <div className="py-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Эмодзи 🎉" value={promoForm.emoji} onChange={(e) => setPromoForm({ ...promoForm, emoji: e.target.value })} />
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Название акции *" value={promoForm.title} onChange={(e) => setPromoForm({ ...promoForm, title: e.target.value })} />
+                    <input className="bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Описание *" value={promoForm.desc} onChange={(e) => setPromoForm({ ...promoForm, desc: e.target.value })} />
+                    <select className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none" value={promoForm.color} onChange={(e) => setPromoForm({ ...promoForm, color: e.target.value })}>
+                      <option value="from-orange-400 to-orange-600" className="text-black">🟠 Оранжевый</option>
+                      <option value="from-green-400 to-green-600" className="text-black">🟢 Зелёный</option>
+                      <option value="from-yellow-400 to-orange-500" className="text-black">🟡 Жёлтый</option>
+                      <option value="from-red-400 to-red-600" className="text-black">🔴 Красный</option>
+                    </select>
+                  </div>
+                  <button onClick={addPromo} disabled={!promoForm.title.trim() || !promoForm.desc.trim()} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white font-bold text-sm transition-all disabled:opacity-40" style={{ background: "var(--fruit-orange)" }}>
+                    <Icon name="Plus" size={14} /> Добавить акцию
+                  </button>
+                </div>
+              )}
+
+              {/* TAB: INFO */}
+              {adminTab === "info" && (
+                <div className="py-4 grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Название магазина</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">ФИО владельца</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={siteOwner} onChange={(e) => setSiteOwner(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Режим работы</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={workHours} onChange={(e) => setWorkHours(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Зона доставки</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={deliveryZone} onChange={(e) => setDeliveryZone(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Стоимость доставки</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={deliveryPrice} onChange={(e) => setDeliveryPrice(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Бесплатно от суммы</label>
+                    <input className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm outline-none w-full" value={freeDelivery} onChange={(e) => setFreeDelivery(e.target.value)} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* NAVBAR */}
-      <nav className="fixed top-7 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-orange-100">
+      <nav
+        className="fixed left-0 right-0 z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-orange-100"
+        style={{ top: isAdmin ? "auto" : "28px" }}
+      >
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <span className="text-3xl animate-float inline-block">🍊</span>
-            <span className="font-pacifico text-xl" style={{ color: "var(--fruit-orange)" }}>
-              ФруктоМаркет
-            </span>
+            <span className="font-pacifico text-xl" style={{ color: "var(--fruit-orange)" }}>{siteName}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1">
             {sections.map((s) => (
-              <button
-                key={s}
-                onClick={() => scrollTo(s)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeSection === s ? "text-white" : "text-gray-600 hover:text-orange-500"
-                }`}
+              <button key={s} onClick={() => scrollTo(s)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeSection === s ? "text-white" : "text-gray-600 hover:text-orange-500"}`}
                 style={activeSection === s ? { background: "var(--fruit-orange)" } : {}}
-              >
-                {s}
-              </button>
+              >{s}</button>
             ))}
           </div>
 
-          <a
-            href={`tel:${PHONE.replace(/\D/g, "")}`}
+          <a href={`tel:${PHONE.replace(/\D/g, "")}`}
             className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-white font-semibold text-sm transition-transform hover:scale-105"
-            style={{ background: "var(--fruit-green)" }}
-          >
-            <Icon name="Phone" size={16} />
-            {PHONE}
+            style={{ background: "var(--fruit-green)" }}>
+            <Icon name="Phone" size={16} />{PHONE}
           </a>
 
           <button className="md:hidden p-2 rounded-lg" onClick={() => setMenuOpen(!menuOpen)}>
@@ -101,28 +263,17 @@ export default function Index() {
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-orange-100 px-4 py-3 flex flex-col gap-2 animate-fade-in">
             {sections.map((s) => (
-              <button
-                key={s}
-                onClick={() => scrollTo(s)}
-                className="text-left px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 font-medium"
-              >
-                {s}
-              </button>
+              <button key={s} onClick={() => scrollTo(s)} className="text-left px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 font-medium">{s}</button>
             ))}
-            <a
-              href={`tel:${PHONE.replace(/\D/g, "")}`}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-white font-semibold"
-              style={{ background: "var(--fruit-green)" }}
-            >
-              <Icon name="Phone" size={16} />
-              {PHONE}
+            <a href={`tel:${PHONE.replace(/\D/g, "")}`} className="flex items-center gap-2 px-3 py-2 rounded-lg text-white font-semibold" style={{ background: "var(--fruit-green)" }}>
+              <Icon name="Phone" size={16} />{PHONE}
             </a>
           </div>
         )}
       </nav>
 
       {/* HERO */}
-      <section id="Главная" className="pt-24 min-h-screen flex items-center hero-gradient relative overflow-hidden">
+      <section id="Главная" className="min-h-screen flex items-center hero-gradient relative overflow-hidden" style={{ paddingTop: isAdmin ? "180px" : "88px" }}>
         <div className="absolute top-20 right-[-100px] w-80 h-80 opacity-20 blob" style={{ background: "var(--fruit-orange)" }} />
         <div className="absolute bottom-20 left-[-60px] w-60 h-60 opacity-15 blob" style={{ background: "var(--fruit-green)" }} />
 
@@ -132,7 +283,6 @@ export default function Index() {
               <span className="w-2 h-2 rounded-full animate-pulse inline-block" style={{ background: "var(--fruit-orange)" }} />
               Свежие фрукты каждый день
             </div>
-
             <h1 className="text-5xl md:text-6xl font-black leading-tight mb-6" style={{ color: "#1A1A1A" }}>
               Вкус спелых{" "}
               <span className="relative inline-block" style={{ color: "var(--fruit-orange)" }}>
@@ -143,30 +293,21 @@ export default function Index() {
               </span>{" "}
               — прямо к вашему столу!
             </h1>
-
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              Заказывайте свежие фрукты по телефону — привезём сами или заберите самовывозом. Быстро, удобно, вкусно!
+              Заказывайте свежие фрукты по телефону — привезём сами или заберите самовывозом. Доставляем: <strong>{deliveryZone}</strong>.
             </p>
-
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href={`tel:${PHONE.replace(/\D/g, "")}`}
+              <a href={`tel:${PHONE.replace(/\D/g, "")}`}
                 className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-lg transition-transform hover:scale-105 shadow-lg"
-                style={{ background: "var(--fruit-orange)" }}
-              >
-                <Icon name="Phone" size={22} />
-                Позвонить и заказать
+                style={{ background: "var(--fruit-orange)" }}>
+                <Icon name="Phone" size={22} /> Позвонить и заказать
               </a>
-              <button
-                onClick={() => scrollTo("Каталог")}
+              <button onClick={() => scrollTo("Каталог")}
                 className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg border-2 transition-all hover:scale-105 bg-white"
-                style={{ borderColor: "var(--fruit-green)", color: "var(--fruit-green)" }}
-              >
-                Смотреть каталог
-                <Icon name="ArrowRight" size={20} />
+                style={{ borderColor: "var(--fruit-green)", color: "var(--fruit-green)" }}>
+                Смотреть каталог <Icon name="ArrowRight" size={20} />
               </button>
             </div>
-
             <div className="flex flex-wrap items-center gap-6 mt-10">
               {[
                 { icon: "Truck", label: "Доставка за 2 часа" },
@@ -183,17 +324,13 @@ export default function Index() {
 
           <div className="relative flex justify-center animate-fade-in">
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden shadow-2xl animate-float" style={{ border: "6px solid var(--fruit-yellow)" }}>
-              <img
-                src="https://cdn.poehali.dev/projects/a699812e-e408-4214-8e18-d2e33a1f4fbb/files/90c7ef35-49ed-4f69-bcec-de492689ff83.jpg"
-                alt="Свежие фрукты"
-                className="w-full h-full object-cover"
-              />
+              <img src="https://cdn.poehali.dev/projects/a699812e-e408-4214-8e18-d2e33a1f4fbb/files/90c7ef35-49ed-4f69-bcec-de492689ff83.jpg" alt="Свежие фрукты" className="w-full h-full object-cover" />
             </div>
             <div className="absolute top-4 right-4 md:right-0 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2">
               <span className="text-2xl">🚚</span>
               <div>
                 <div className="font-bold text-sm text-gray-800">Доставка</div>
-                <div className="text-xs text-gray-500">от 200 ₽</div>
+                <div className="text-xs text-gray-500">{deliveryPrice}</div>
               </div>
             </div>
             <div className="absolute bottom-8 left-0 md:-left-6 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2">
@@ -216,17 +353,18 @@ export default function Index() {
             <p className="text-gray-500 text-lg">Успей воспользоваться выгодными предложениями</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {promotions.map((promo) => (
-              <div key={promo.title} className={`bg-gradient-to-br ${promo.color} rounded-3xl p-7 text-white shadow-lg card-hover`}>
+            {promoList.map((promo, idx) => (
+              <div key={idx} className={`bg-gradient-to-br ${promo.color} rounded-3xl p-7 text-white shadow-lg card-hover relative`}>
+                {isAdmin && (
+                  <button onClick={() => deletePromo(idx)} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors">
+                    <Icon name="X" size={14} />
+                  </button>
+                )}
                 <div className="text-5xl mb-4">{promo.emoji}</div>
                 <h3 className="text-xl font-black mb-2">{promo.title}</h3>
                 <p className="text-white/90 text-sm leading-relaxed">{promo.desc}</p>
-                <a
-                  href={`tel:${PHONE.replace(/\D/g, "")}`}
-                  className="mt-5 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                >
-                  <Icon name="Phone" size={14} />
-                  Узнать подробнее
+                <a href={`tel:${PHONE.replace(/\D/g, "")}`} className="mt-5 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+                  <Icon name="Phone" size={14} /> Узнать подробнее
                 </a>
               </div>
             ))}
@@ -237,96 +375,23 @@ export default function Index() {
       {/* КАТАЛОГ */}
       <section id="Каталог" className="py-20" style={{ background: "var(--fruit-bg)" }}>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-14">
             <div className="section-divider mx-auto mb-4" />
             <h2 className="text-4xl font-black mb-3" style={{ color: "#1A1A1A" }}>🛒 Наш каталог</h2>
             <p className="text-gray-500 text-lg">Свежайшие фрукты по отличным ценам</p>
-            <button
-              onClick={() => setAdminOpen(!adminOpen)}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all hover:scale-105 bg-white"
-              style={{ borderColor: "var(--fruit-orange)", color: "var(--fruit-orange)" }}
-            >
-              <Icon name={adminOpen ? "ChevronUp" : "Settings"} size={16} />
-              {adminOpen ? "Скрыть панель" : "Управление каталогом"}
-            </button>
           </div>
-
-          {/* ПАНЕЛЬ ДОБАВЛЕНИЯ */}
-          {adminOpen && (
-            <div className="bg-white rounded-3xl p-6 mb-10 shadow-md border-2 animate-fade-in" style={{ borderColor: "var(--fruit-orange)" }}>
-              <h3 className="font-black text-xl text-gray-800 mb-5">➕ Добавить фрукт</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <input
-                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: "#ddd" }}
-                  placeholder="Эмодзи 🍑"
-                  value={form.emoji}
-                  onChange={(e) => setForm({ ...form, emoji: e.target.value })}
-                />
-                <input
-                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: "#ddd" }}
-                  placeholder="Название *"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-                <input
-                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: "#ddd" }}
-                  placeholder="Описание"
-                  value={form.desc}
-                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
-                />
-                <input
-                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: "#ddd" }}
-                  placeholder="Цена * (напр. от 99 ₽/кг)"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                />
-                <select
-                  className="border rounded-xl px-3 py-2 text-sm outline-none"
-                  style={{ borderColor: "#ddd" }}
-                  value={form.badge}
-                  onChange={(e) => setForm({ ...form, badge: e.target.value })}
-                >
-                  {BADGES.map((b) => (
-                    <option key={b} value={b}>{b || "Без метки"}</option>
-                  ))}
-                </select>
-              </div>
-              <button
-                onClick={addFruit}
-                disabled={!form.name.trim() || !form.price.trim()}
-                className="mt-4 flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold text-sm transition-transform hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: "var(--fruit-green)" }}
-              >
-                <Icon name="Plus" size={16} />
-                Добавить в каталог
-              </button>
-            </div>
-          )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {fruitList.map((fruit, idx) => (
               <div key={idx} className="bg-white rounded-3xl p-5 shadow-sm card-hover relative overflow-hidden">
                 {fruit.badge && (
-                  <div
-                    className="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-full text-white"
-                    style={{
-                      background: fruit.badge === "Акция" ? "var(--fruit-orange)"
-                        : fruit.badge === "Хит" ? "var(--fruit-red)"
-                        : "var(--fruit-green)"
-                    }}
-                  >
+                  <div className="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-full text-white"
+                    style={{ background: fruit.badge === "Акция" ? "var(--fruit-orange)" : fruit.badge === "Хит" ? "var(--fruit-red)" : "var(--fruit-green)" }}>
                     {fruit.badge}
                   </div>
                 )}
-                {adminOpen && (
-                  <button
-                    onClick={() => deleteFruit(idx)}
-                    className="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
-                  >
+                {isAdmin && (
+                  <button onClick={() => deleteFruit(idx)} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10">
                     <Icon name="X" size={14} />
                   </button>
                 )}
@@ -334,13 +399,10 @@ export default function Index() {
                 <h3 className="font-black text-lg text-center text-gray-800 mb-1">{fruit.name}</h3>
                 <p className="text-gray-400 text-xs text-center mb-3">{fruit.desc}</p>
                 <div className="text-center font-bold text-base" style={{ color: "var(--fruit-orange)" }}>{fruit.price}</div>
-                <a
-                  href={`tel:${PHONE.replace(/\D/g, "")}`}
+                <a href={`tel:${PHONE.replace(/\D/g, "")}`}
                   className="mt-3 w-full flex items-center justify-center gap-1 py-2 rounded-xl text-white text-sm font-semibold transition-transform hover:scale-105"
-                  style={{ background: "var(--fruit-green)" }}
-                >
-                  <Icon name="Phone" size={13} />
-                  Заказать
+                  style={{ background: "var(--fruit-green)" }}>
+                  <Icon name="Phone" size={13} /> Заказать
                 </a>
               </div>
             ))}
@@ -348,13 +410,10 @@ export default function Index() {
 
           <div className="text-center mt-10">
             <p className="text-gray-500 mb-4">Не нашли нужный фрукт? Позвоните — у нас большой выбор!</p>
-            <a
-              href={`tel:${PHONE.replace(/\D/g, "")}`}
+            <a href={`tel:${PHONE.replace(/\D/g, "")}`}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
-              style={{ background: "var(--fruit-orange)" }}
-            >
-              <Icon name="Phone" size={20} />
-              {PHONE}
+              style={{ background: "var(--fruit-orange)" }}>
+              <Icon name="Phone" size={20} />{PHONE}
             </a>
           </div>
         </div>
@@ -375,18 +434,15 @@ export default function Index() {
               <h3 className="text-2xl font-black mb-4 text-gray-800">Доставка на дом</h3>
               <ul className="space-y-3 text-gray-600 text-sm font-medium">
                 <li>⏱️ Доставка в течение 2 часов</li>
-                <li>💰 От 200 ₽ за доставку</li>
-                <li>🎁 Бесплатно при заказе от 1500 ₽</li>
-                <li>📍 Доставляем по всему городу</li>
-                <li>🕐 Работаем с 8:00 до 22:00</li>
+                <li>💰 {deliveryPrice} за доставку</li>
+                <li>🎁 Бесплатно при заказе {freeDelivery}</li>
+                <li>📍 Доставляем: {deliveryZone}</li>
+                <li>🕐 Работаем с {workHours}</li>
               </ul>
-              <a
-                href={`tel:${PHONE.replace(/\D/g, "")}`}
+              <a href={`tel:${PHONE.replace(/\D/g, "")}`}
                 className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-transform hover:scale-105"
-                style={{ background: "var(--fruit-orange)" }}
-              >
-                <Icon name="Phone" size={16} />
-                Заказать доставку
+                style={{ background: "var(--fruit-orange)" }}>
+                <Icon name="Phone" size={16} /> Заказать доставку
               </a>
             </div>
 
@@ -397,16 +453,13 @@ export default function Index() {
                 <li>🆓 Самовывоз абсолютно бесплатно</li>
                 <li>⚡ Заберите в любое удобное время</li>
                 <li>📍 Адрес уточняйте по телефону</li>
-                <li>🕐 Работаем с 8:00 до 21:00</li>
+                <li>🕐 Работаем с {workHours}</li>
                 <li>✅ Товар будет ждать вас готовым</li>
               </ul>
-              <a
-                href={`tel:${PHONE.replace(/\D/g, "")}`}
+              <a href={`tel:${PHONE.replace(/\D/g, "")}`}
                 className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-transform hover:scale-105"
-                style={{ background: "var(--fruit-green)" }}
-              >
-                <Icon name="Phone" size={16} />
-                Уточнить адрес
+                style={{ background: "var(--fruit-green)" }}>
+                <Icon name="Phone" size={16} /> Уточнить адрес
               </a>
             </div>
           </div>
@@ -421,7 +474,6 @@ export default function Index() {
             <h2 className="text-4xl font-black mb-3" style={{ color: "#1A1A1A" }}>🌿 О нас</h2>
             <p className="text-gray-500 text-lg">Почему выбирают нас?</p>
           </div>
-
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-lg text-gray-600 leading-relaxed mb-6">
@@ -431,11 +483,7 @@ export default function Index() {
                 Уже более 5 лет мы доставляем радость на столы наших клиентов. Более 1000 довольных покупателей — лучшая награда для нас!
               </p>
               <div className="grid grid-cols-3 gap-4">
-                {[
-                  { num: "5+", label: "лет работы" },
-                  { num: "1000+", label: "клиентов" },
-                  { num: "50+", label: "видов фруктов" },
-                ].map(({ num, label }) => (
+                {[{ num: "5+", label: "лет работы" }, { num: "1000+", label: "клиентов" }, { num: "50+", label: "видов фруктов" }].map(({ num, label }) => (
                   <div key={label} className="text-center bg-white rounded-2xl p-4 shadow-sm">
                     <div className="text-3xl font-black" style={{ color: "var(--fruit-orange)" }}>{num}</div>
                     <div className="text-xs text-gray-500 mt-1 font-medium">{label}</div>
@@ -443,7 +491,6 @@ export default function Index() {
                 ))}
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               {[
                 { emoji: "🌱", title: "Свежесть", desc: "Фрукты поступают ежедневно от проверенных поставщиков" },
@@ -470,31 +517,23 @@ export default function Index() {
             <h2 className="text-4xl font-black mb-3" style={{ color: "#1A1A1A" }}>📞 Контакты</h2>
             <p className="text-gray-500 text-lg">Свяжитесь с нами удобным способом</p>
           </div>
-
           <div className="max-w-3xl mx-auto">
-            <div
-              className="rounded-3xl p-10 text-center mb-8 shadow-lg"
-              style={{ background: "linear-gradient(135deg, var(--fruit-orange), #FFD700)" }}
-            >
+            <div className="rounded-3xl p-10 text-center mb-8 shadow-lg" style={{ background: "linear-gradient(135deg, var(--fruit-orange), #FFD700)" }}>
               <div className="text-6xl mb-4">📱</div>
               <h3 className="text-3xl font-black text-white mb-2">Позвоните нам!</h3>
               <p className="text-white/90 mb-6 text-lg">Принимаем заказы по телефону каждый день</p>
-              <a
-                href={`tel:${PHONE.replace(/\D/g, "")}`}
+              <a href={`tel:${PHONE.replace(/\D/g, "")}`}
                 className="inline-flex items-center gap-3 bg-white px-8 py-4 rounded-2xl font-black text-2xl shadow-lg transition-transform hover:scale-105"
-                style={{ color: "var(--fruit-orange)" }}
-              >
-                <Icon name="Phone" size={28} />
-                {PHONE}
+                style={{ color: "var(--fruit-orange)" }}>
+                <Icon name="Phone" size={28} />{PHONE}
               </a>
-              <p className="text-white/80 mt-4 text-sm">Работаем с 8:00 до 22:00 без выходных</p>
+              <p className="text-white/80 mt-4 text-sm">Работаем с {workHours} без выходных</p>
             </div>
-
             <div className="grid md:grid-cols-3 gap-5">
               {[
-                { emoji: "🕐", title: "Режим работы", desc: "Пн–Вс: 8:00 – 22:00" },
-                { emoji: "📍", title: "Самовывоз", desc: "Адрес уточняйте по телефону" },
-                { emoji: "🚚", title: "Зона доставки", desc: "По всему городу и пригороду" },
+                { emoji: "🕐", title: "Режим работы", desc: `Пн–Вс: ${workHours}` },
+                { emoji: "📍", title: "Зона доставки", desc: deliveryZone },
+                { emoji: "🚚", title: "Стоимость", desc: `Доставка ${deliveryPrice}, бесплатно ${freeDelivery}` },
               ].map(({ emoji, title, desc }) => (
                 <div key={title} className="text-center bg-gray-50 rounded-2xl p-5">
                   <div className="text-3xl mb-2">{emoji}</div>
@@ -511,25 +550,18 @@ export default function Index() {
       <footer className="py-8 text-center" style={{ background: "#1A1A1A" }}>
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="text-2xl">🍊</span>
-          <span className="font-pacifico text-lg text-white">ФруктоМаркет</span>
+          <span className="font-pacifico text-lg text-white">{siteName}</span>
         </div>
-        <p className="text-gray-400 text-sm">Свежие фрукты с доставкой на дом</p>
-        <a
-          href={`tel:${PHONE.replace(/\D/g, "")}`}
-          className="inline-flex items-center gap-2 mt-3 text-sm font-semibold"
-          style={{ color: "var(--fruit-yellow)" }}
-        >
-          <Icon name="Phone" size={14} />
-          {PHONE}
+        <p className="text-gray-400 text-sm">Свежие фрукты с доставкой: {deliveryZone}</p>
+        <a href={`tel:${PHONE.replace(/\D/g, "")}`} className="inline-flex items-center gap-2 mt-3 text-sm font-semibold" style={{ color: "var(--fruit-yellow)" }}>
+          <Icon name="Phone" size={14} />{PHONE}
         </a>
       </footer>
 
       {/* Floating call button (mobile) */}
-      <a
-        href={`tel:${PHONE.replace(/\D/g, "")}`}
+      <a href={`tel:${PHONE.replace(/\D/g, "")}`}
         className="fixed bottom-6 right-6 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl z-50 md:hidden transition-transform hover:scale-110"
-        style={{ background: "var(--fruit-green)" }}
-      >
+        style={{ background: "var(--fruit-green)" }}>
         <Icon name="Phone" size={28} className="text-white" />
       </a>
     </div>
