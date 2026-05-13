@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
-const PHONE = "+7 (999) 123-45-67";
+const PHONE = "+7 (902) 813-34-45";
 
 const fruits = [
   { emoji: "🍎", name: "Яблоки", desc: "Свежие, сочные, хрустящие", price: "от 89 ₽/кг", badge: "Хит" },
