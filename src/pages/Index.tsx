@@ -3,7 +3,21 @@ import Icon from "@/components/ui/icon";
 
 const PHONE = "+7 (902) 813-34-45";
 
-const fruits = [
+
+
+const promotions = [
+  { emoji: "🛍️", title: "3 кг яблок = 4-й в подарок", desc: "При покупке от 3 кг яблок — 1 кг бесплатно!", color: "from-orange-400 to-orange-600" },
+  { emoji: "🚚", title: "Бесплатная доставка", desc: "При заказе от 1500 ₽ доставка бесплатно", color: "from-green-400 to-green-600" },
+  { emoji: "🎁", title: "Скидка 15% новым клиентам", desc: "Первый заказ — скидка 15% на всё!", color: "from-yellow-400 to-orange-500" },
+];
+
+const sections = ["Главная", "Каталог", "Доставка", "О нас", "Акции", "Контакты"];
+
+const BADGES = ["", "Хит", "Акция", "Новинка"];
+
+type Fruit = { emoji: string; name: string; desc: string; price: string; badge: string };
+
+const defaultFruits: Fruit[] = [
   { emoji: "🍎", name: "Яблоки", desc: "Свежие, сочные, хрустящие", price: "от 89 ₽/кг", badge: "Хит" },
   { emoji: "🍊", name: "Апельсины", desc: "Сочные и ароматные", price: "от 129 ₽/кг", badge: "Акция" },
   { emoji: "🍇", name: "Виноград", desc: "Сладкий без косточек", price: "от 199 ₽/кг", badge: "" },
@@ -14,17 +28,22 @@ const fruits = [
   { emoji: "🍋", name: "Лимоны", desc: "Свежие, без воска", price: "от 99 ₽/кг", badge: "" },
 ];
 
-const promotions = [
-  { emoji: "🛍️", title: "3 кг яблок = 4-й в подарок", desc: "При покупке от 3 кг яблок — 1 кг бесплатно!", color: "from-orange-400 to-orange-600" },
-  { emoji: "🚚", title: "Бесплатная доставка", desc: "При заказе от 1500 ₽ доставка бесплатно", color: "from-green-400 to-green-600" },
-  { emoji: "🎁", title: "Скидка 15% новым клиентам", desc: "Первый заказ — скидка 15% на всё!", color: "from-yellow-400 to-orange-500" },
-];
-
-const sections = ["Главная", "Каталог", "Доставка", "О нас", "Акции", "Контакты"];
-
 export default function Index() {
   const [activeSection, setActiveSection] = useState("Главная");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [fruitList, setFruitList] = useState<Fruit[]>(defaultFruits);
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [form, setForm] = useState<Fruit>({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
+
+  const addFruit = () => {
+    if (!form.name.trim() || !form.price.trim()) return;
+    setFruitList((prev) => [...prev, form]);
+    setForm({ emoji: "🍑", name: "", desc: "", price: "", badge: "" });
+  };
+
+  const deleteFruit = (idx: number) => {
+    setFruitList((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -218,18 +237,82 @@ export default function Index() {
       {/* КАТАЛОГ */}
       <section id="Каталог" className="py-20" style={{ background: "var(--fruit-bg)" }}>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10">
             <div className="section-divider mx-auto mb-4" />
             <h2 className="text-4xl font-black mb-3" style={{ color: "#1A1A1A" }}>🛒 Наш каталог</h2>
             <p className="text-gray-500 text-lg">Свежайшие фрукты по отличным ценам</p>
+            <button
+              onClick={() => setAdminOpen(!adminOpen)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all hover:scale-105 bg-white"
+              style={{ borderColor: "var(--fruit-orange)", color: "var(--fruit-orange)" }}
+            >
+              <Icon name={adminOpen ? "ChevronUp" : "Settings"} size={16} />
+              {adminOpen ? "Скрыть панель" : "Управление каталогом"}
+            </button>
           </div>
 
+          {/* ПАНЕЛЬ ДОБАВЛЕНИЯ */}
+          {adminOpen && (
+            <div className="bg-white rounded-3xl p-6 mb-10 shadow-md border-2 animate-fade-in" style={{ borderColor: "var(--fruit-orange)" }}>
+              <h3 className="font-black text-xl text-gray-800 mb-5">➕ Добавить фрукт</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <input
+                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
+                  style={{ borderColor: "#ddd" }}
+                  placeholder="Эмодзи 🍑"
+                  value={form.emoji}
+                  onChange={(e) => setForm({ ...form, emoji: e.target.value })}
+                />
+                <input
+                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
+                  style={{ borderColor: "#ddd" }}
+                  placeholder="Название *"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+                <input
+                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
+                  style={{ borderColor: "#ddd" }}
+                  placeholder="Описание"
+                  value={form.desc}
+                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                />
+                <input
+                  className="border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2"
+                  style={{ borderColor: "#ddd" }}
+                  placeholder="Цена * (напр. от 99 ₽/кг)"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
+                <select
+                  className="border rounded-xl px-3 py-2 text-sm outline-none"
+                  style={{ borderColor: "#ddd" }}
+                  value={form.badge}
+                  onChange={(e) => setForm({ ...form, badge: e.target.value })}
+                >
+                  {BADGES.map((b) => (
+                    <option key={b} value={b}>{b || "Без метки"}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={addFruit}
+                disabled={!form.name.trim() || !form.price.trim()}
+                className="mt-4 flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold text-sm transition-transform hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: "var(--fruit-green)" }}
+              >
+                <Icon name="Plus" size={16} />
+                Добавить в каталог
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {fruits.map((fruit) => (
-              <div key={fruit.name} className="bg-white rounded-3xl p-5 shadow-sm card-hover relative overflow-hidden">
+            {fruitList.map((fruit, idx) => (
+              <div key={idx} className="bg-white rounded-3xl p-5 shadow-sm card-hover relative overflow-hidden">
                 {fruit.badge && (
                   <div
-                    className="absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded-full text-white"
+                    className="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-full text-white"
                     style={{
                       background: fruit.badge === "Акция" ? "var(--fruit-orange)"
                         : fruit.badge === "Хит" ? "var(--fruit-red)"
@@ -238,6 +321,14 @@ export default function Index() {
                   >
                     {fruit.badge}
                   </div>
+                )}
+                {adminOpen && (
+                  <button
+                    onClick={() => deleteFruit(idx)}
+                    className="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
+                  >
+                    <Icon name="X" size={14} />
+                  </button>
                 )}
                 <div className="text-5xl mb-3 text-center">{fruit.emoji}</div>
                 <h3 className="font-black text-lg text-center text-gray-800 mb-1">{fruit.name}</h3>
