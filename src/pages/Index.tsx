@@ -452,14 +452,23 @@ export default function Index() {
               <ul className="space-y-3 text-gray-600 text-sm font-medium">
                 <li>🆓 Самовывоз абсолютно бесплатно</li>
                 <li>⚡ Заберите в любое удобное время</li>
-                <li>📍 Адрес уточняйте по телефону</li>
+                <li>📍 г. Заводоуковск, ул. Хахина, 2</li>
                 <li>🕐 Работаем с {workHours}</li>
                 <li>✅ Товар будет ждать вас готовым</li>
               </ul>
+              <a
+                href="https://maps.yandex.ru/?text=Заводоуковск+улица+Хахина+2"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-transform hover:scale-105 bg-white border-2"
+                style={{ borderColor: "var(--fruit-green)", color: "var(--fruit-green)" }}
+              >
+                <Icon name="MapPin" size={16} /> Открыть на карте
+              </a>
               <a href={`tel:${PHONE.replace(/\D/g, "")}`}
-                className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-transform hover:scale-105"
+                className="mt-3 inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-transform hover:scale-105"
                 style={{ background: "var(--fruit-green)" }}>
-                <Icon name="Phone" size={16} /> Уточнить адрес
+                <Icon name="Phone" size={16} /> Позвонить
               </a>
             </div>
           </div>
@@ -532,7 +541,7 @@ export default function Index() {
             <div className="grid md:grid-cols-3 gap-5">
               {[
                 { emoji: "🕐", title: "Режим работы", desc: `Пн–Вс: ${workHours}` },
-                { emoji: "📍", title: "Зона доставки", desc: deliveryZone },
+                { emoji: "📍", title: "Самовывоз", desc: "г. Заводоуковск, ул. Хахина, 2" },
                 { emoji: "🚚", title: "Стоимость", desc: `Доставка ${deliveryPrice}, бесплатно ${freeDelivery}` },
               ].map(({ emoji, title, desc }) => (
                 <div key={title} className="text-center bg-gray-50 rounded-2xl p-5">
