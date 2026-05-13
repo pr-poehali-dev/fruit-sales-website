@@ -236,7 +236,7 @@ export default function Index() {
       >
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <span className="text-3xl animate-float inline-block">🍊</span>
+            <span className="text-3xl animate-spin-slow inline-block">🍉</span>
             <span className="font-pacifico text-xl" style={{ color: "var(--fruit-orange)" }}>{siteName}</span>
           </div>
 
@@ -549,7 +549,7 @@ export default function Index() {
       {/* FOOTER */}
       <footer className="py-8 text-center" style={{ background: "#1A1A1A" }}>
         <div className="flex items-center justify-center gap-2 mb-3">
-          <span className="text-2xl">🍊</span>
+          <span className="text-2xl animate-spin-slow inline-block">🍉</span>
           <span className="font-pacifico text-lg text-white">{siteName}</span>
         </div>
         <p className="text-gray-400 text-sm">Свежие фрукты с доставкой: {deliveryZone}</p>
