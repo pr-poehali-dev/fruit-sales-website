@@ -35,8 +35,13 @@ export default function Index() {
 
   return (
     <div className="min-h-screen font-golos" style={{ background: "var(--fruit-bg)" }}>
+      {/* TOP BAR */}
+      <div className="fixed top-0 left-0 right-0 z-50 text-center py-1.5 text-xs font-semibold text-white" style={{ background: "var(--fruit-green)" }}>
+        Махсуджонов Амон Абдусамиевич
+      </div>
+
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-orange-100">
+      <nav className="fixed top-7 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-orange-100">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <span className="text-3xl animate-float inline-block">🍊</span>
@@ -98,7 +103,7 @@ export default function Index() {
       </nav>
 
       {/* HERO */}
-      <section id="Главная" className="pt-16 min-h-screen flex items-center hero-gradient relative overflow-hidden">
+      <section id="Главная" className="pt-24 min-h-screen flex items-center hero-gradient relative overflow-hidden">
         <div className="absolute top-20 right-[-100px] w-80 h-80 opacity-20 blob" style={{ background: "var(--fruit-orange)" }} />
         <div className="absolute bottom-20 left-[-60px] w-60 h-60 opacity-15 blob" style={{ background: "var(--fruit-green)" }} />
 
